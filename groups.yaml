@@ -1,0 +1,42 @@
+awesome_people:
+  name: People
+  view: false
+  control: hidden
+  entities:
+   - person.chris
+   - person.heather
+
+master_bedroom:
+  name: Master Bedroom
+  view: false
+  entities:
+   - media_player.bedroom_home
+   - sensor.bedroom_button_temperature_measurement
+   - light.chris_s_nightstand
+   - light.bedroom_light_1
+
+Heather_Person:
+  name: Heather
+  view: false
+  control: hidden
+  entities:
+   - person.heather
+   - binary_sensor.heather_s_keys_presence
+   - binary_sensor.h_nielsen02_gmail_com_s_galaxy_note8_presence
+
+Chris_Person:
+  name: Chris
+  control: hidden
+  view: false
+  entities:
+   - person.chris
+   - binary_sensor.chris_keys_presence
+   - binary_sensor.chris_phone_presence
+
+Speakers:
+  name: Speakers
+  view: false
+  entities:
+    - media_player.bedroom_home
+    - media_player.living_room_home
+    - media_player.kitchen_speaker

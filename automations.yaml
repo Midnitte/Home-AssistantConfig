@@ -1,0 +1,161 @@
+- id: '1554596874312'
+  alias: Reminder for Temp
+  trigger:
+  - at: '20:00'
+    platform: time
+  condition:
+    condition: or
+    conditions:
+    - above: '72'
+      condition: numeric_state
+      entity_id: sensor.bedroom_button_temperature_measurement
+    - below: '65'
+      condition: numeric_state
+      entity_id: sensor.bedroom_button_temperature_measurement
+  action:
+  - data_template:
+      message: Did someone remember to adjust the temperature? Its currently {{ states
+        ('sensor.bedroom_button_temperature_measurement') }}°F
+    service: notify.discord_webhook
+- id: '1554597530878'
+  alias: Chris Home Time
+  trigger:
+    platform: zone
+    entity_id: person.chris
+    zone: zone.chris_work
+    event: leave
+  condition:
+  - after: '14:00'
+    before: '20:00'
+    condition: time
+  action:
+  - data_template:
+      message: 'Chris will be home at about {{ states(''sensor.chris_travel_time'')
+        }}. About {{ states(''sensor.chris_time_from_work'') }} minutes. :red_car:'
+    service: notify.discord_webhook
+- id: '1554641088415'
+  alias: Starting to Rain
+  trigger:
+  - entity_id: sensor.dark_sky_icon
+    platform: state
+    to: rain
+  condition:
+    condition: and
+    conditions:
+    - condition: time
+      after: 08:00
+      before: '22:00'
+    - condition: template
+      value_template: '{% set last_run = as_timestamp(state_attr(''automation.starting_to_rain'',
+        ''last_triggered'')) %} {{ (last_run == none or (as_timestamp(now()) - last_run)
+        > 60*60) }}'
+  action:
+  - data:
+      message: 'It looks like it''s starting to rain. :cloud_rain:'
+    service: notify.discord_webhook
+- id: '1555204301721'
+  alias: Might Rain
+  trigger:
+  - at: '7:00'
+    platform: time
+  condition:
+  - condition: state
+    entity_id: sensor.dark_sky_icon_0
+    state: rain
+  action:
+  - data:
+      message: 'Looks like it might rain today :umbrella:'
+    service: notify.discord_webhook
+- alias: Pollen
+  trigger:
+  - at: '7:00'
+    platform: time
+  condition:
+  - condition: numeric_state
+    entity_id: sensor.allergy_index_today
+    above: 5.9
+  action:
+  - data_template:
+      message: 'The pollen count is {{ states(''sensor.allergy_index_today'')}} out
+        of 12 today. :sneezing_face:'
+    service: notify.discord_webhook
+  id: 96ae3de2cf8e4ca4bac7114a7ea3e368
+- id: '1556157989107'
+  alias: Test Discord
+  trigger:
+  - above: '78'
+    entity_id: sensor.bedroom_button_temperature_measurement
+    platform: numeric_state
+  condition: []
+  action:
+  - data:
+      message: Testing. . .
+    service: notify.discord_webhook
+- id: '1556233096462'
+  alias: No Ones Home
+  trigger:
+  - entity_id: group.awesome_people
+    platform: state
+    to: not_home
+  condition: []
+  action:
+  - data:
+      message: 'No ones at home, turning off lights. :house_abandoned: '
+    service: notify.discord_webhook
+  - data:
+      entity_id: group.all_lights
+    service: light.turn_off
+- id: '1558277408793'
+  alias: Chris Is Home
+  trigger:
+  - entity_id: person.chris
+    platform: state
+    to: home
+  condition: []
+  action:
+  - data:
+      message: Chris is home
+    service: notify.discord_webhook
+- id: '1558280857191'
+  alias: Gingers Here
+  trigger:
+  - entity_id: device_tracker.galaxy_s9_lan
+    platform: state
+    to: home
+  condition: []
+  action:
+  - alias: ''
+    data:
+      message: It looks like Ginger is here.
+    service: notify.discord_webhook
+- id: '1563585162092'
+  alias: Heather Home Time
+  trigger:
+  - at: '16:00'
+    platform: time
+  condition:
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: 'true'
+  action:
+  - data_template:
+      message: '<@381239478674522113> looks like your ride home will take about {{
+        states (''sensor.heather_s_time_from_work'') }} minutes. :white_car:'
+    service: notify.discord_webhook
+- id: '1563723065457'
+  alias: AMA Today
+  trigger:
+  - at: 08:00
+    platform: time
+  condition:
+  - condition: template
+    value_template: '{{as_timestamp(states.calendar.iama_schedule.attributes.start_time) | timestamp_custom("%m-%d-%y", true) == as_timestamp(now()) | timestamp_custom("%m-%d-%y", true) }}'
+  action:
+  - data_template:
+      message: >
+        Looks like there's a AMA today at {{as_timestamp(states.calendar.iama_schedule.attributes.start_time) | timestamp_custom("%I:%M %p", true)}}.
+        ```It's for {{states.calendar.iama_schedule.attributes.message | regex_replace('\(.+\)', replace='', ignorecase=False)}}
+
+        
+        {{states.calendar.iama_schedule.attributes.description}}```
+    service: notify.discord_webhook

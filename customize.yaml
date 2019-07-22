@@ -1,0 +1,49 @@
+sensor.yr_symbol:
+  friendly_name: Weather
+zwave.sigma_designs_uzb_z_wave_usb_adapter:
+  is_zwave_plus: true
+sensor.cpu_temperature:
+  unit_of_measurement: °C
+  icon: mdi:fan
+binary_sensor.front_door_contact:
+  icon: mdi:door-open
+sensor.home_assistant_v2_db:
+  icon: mdi:database
+device_tracker.hubv2_d052a8a4f0880001_lan:
+  friendly_name: Smartthings Hub
+  icon: mdi:server-network
+device_tracker.galaxy_note8_lan:
+  friendly_name: Heather Phone (wifi)
+device_tracker.lgwebostv_lan:
+  friendly_name: Living Room TV (webOS)
+device_tracker.galaxy_note8_3288_lan:
+  friendly_name: Chris Phone (wifi)
+device_tracker.galaxy_s9_lan:
+  friendly_name: Ginger
+person.chris:
+  entity_picture: /local/pictures/profileshotchris.png
+person.heather:
+  entity_picture: /local/pictures/profileshotheather.png
+binary_sensor.chris_keys_presence:
+  icon: mdi:key
+binary_sensor.heather_s_keys_presence:
+  icon: mdi:key
+binary_sensor.christopher_norulak_s_chris_note8_presence:
+  icon: mdi:cellphone-wireless
+binary_sensor.chris_phone_presence:
+  icon: mdi:cellphone-wireless
+binary_sensor.h_nielsen02_gmail_com_s_galaxy_note8_presence:
+  icon: mdi:cellphone-wireless
+binary_sensor.chris_meta_presence:
+  icon: mdi:home-account
+binary_sensor.remote_ui:
+  icon: mdi:cloud-check
+device_tracker.192_168_40_117_02_72_d8_87_04_f5: {}
+light.chris_s_nightstand:
+  icon: mdi:lamp
+light.heather_s_nightstand:
+  icon: mdi:lamp
+light.corner_light:
+  icon: mdi:floor-lamp
+binary_sensor.heather_meta_presence:
+  icon: mdi:home-account

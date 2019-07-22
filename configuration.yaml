@@ -1,0 +1,174 @@
+﻿homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 13
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/New_York
+  # Customization file
+  customize: !include customize.yaml
+  # Whitelist files
+  whitelist_external_dirs:
+    - /home/homeassistant/.homeassistant
+    - /home/homeassistant/.homeassistant/tmp/tts
+
+frontend:
+  javascript_version: latest
+  themes: !include_dir_merge_named themes
+  extra_html_url:
+    - /local/icons.html
+
+
+recorder:
+  exclude:
+    entities:
+      - sensor.chris_travel_time
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+python_script:
+
+#auth_providers:
+ # - type: trusted_networks
+  #  trusted_networks:
+   #   - 192.168.0.0/24
+
+updater:
+  include_used_components: true
+
+# Zones
+zone:
+
+  # This will override the default home zone
+  - name: Home
+    latitude: !secret home_latitude
+    longitude: !secret home_longitude
+    radius: 20
+    icon: mdi:home
+
+  - name: Chris' Work
+    latitude: !secret chris_work_latitude
+    longitude: !secret chris_work_longitude
+    radius: 160
+    icon: mdi:microscope
+
+  - name: Heather's Work
+    latitude: !secret heather_work_latitude
+    longitude: !secret heather_work_longitude
+    radius: 10
+    icon: mdi:domain
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Discover some devices automatically
+discovery:
+
+# Pollen
+iqvia:
+  zip_code: !secret zip_code
+  # monitored_conditions:
+  #   - allergy_average_forecasted
+  #   - allergy_index_today
+  #   - allergy_index_tomorrow
+  #   - asthma_average_forecasted
+  #   - asthma_index_today
+  #   - asthma_index_tomorrow
+  #   - disease_average_forecasted
+  #   - disease_index_today
+
+# Telegram Bot for notifications
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram_api_key
+    allowed_chat_ids:
+      - !secret telegram_group_id
+      - !secret chris_telegram_id
+
+# Discord Bot
+
+notify:
+  - platform: discord
+    name: discord
+    token: !secret discord_token
+
+  - platform: rest
+    name: discord_webhook
+    method: POST
+    message_param_name: content
+    title_param_name: username
+    data:
+      username: Home Assistant
+    resource: "https://ptb.discordapp.com/api/webhooks/579723491964616752/iO8ggXR1s0x0-YMumt7TzRCLuJkn_L3Pm5hp3c-dEU_QUHhk6EiHHwV53m0QWRHane7I"
+
+
+# IFTTT Maker
+ifttt:
+  key: !secret ifttt_key
+
+# Weather Data
+weather:
+# Home
+  - platform: openweathermap
+    api_key: !secret openweather_key
+    latitude: !secret home_latitude
+    longitude: !secret home_longitude
+#Chris' Work
+  - platform: openweathermap
+    api_key: !secret openweather_key
+    latitude: !secret chris_work_latitude
+    longitude: !secret chris_work_longitude
+
+#Heather's Work
+  - platform: openweathermap
+    api_key: !secret openweather_key
+    latitude: !secret heather_work_latitude
+    longitude: !secret heather_work_longitude
+
+
+# Trackers
+device_tracker:
+  - platform: bluetooth_tracker
+    consider_home: 00:20:00
+    interval_seconds: 20
+    request_rssi: true
+    new_device_defaults:
+      track_new_devices: true
+  - platform: nmap_tracker
+    hosts: 192.168.40.1/24
+    home_interval: 180
+    interval_seconds: 30
+    exclude:
+      - 192.168.40.19
+
+owntracks:
+
+googlehome:
+  devices:
+    - host: 192.168.40.74 #Kitchen
+    - host: 192.168.40.117 #Bedroom?
+    - host: 192.168.40.108 #Living Room?
+
+google:
+  client_id: !secret googleclientidcal
+  client_secret: !secret googlesecretcal
+
+# Sensors
+sensor: !include sensor.yaml
+binary_sensor: !include binary_sensor.yaml
+
+# Text to speech
+tts:
+  - platform: google_translate
+    language: 'en-uk'
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml

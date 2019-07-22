@@ -1,0 +1,15 @@
+views:
+ - title: Main
+   icon: mdi:home
+   cards:
+    - type: glace
+      title: Bedroom Lights
+      column_width: calc(100% / 2)
+      entities:
+       - light.bedroom_light
+         name: Bedroom Light
+         
+       - light.chris_nightstand
+         name: Bedroom Light
+         icon: mdi:desk-lamp
+         

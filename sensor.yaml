@@ -1,0 +1,93 @@
+
+  # Weather
+  - platform: yr
+    forecast: 24
+    monitored_conditions:
+      - temperature
+      - symbol
+      - precipitation
+      - windSpeed
+      - pressure
+      - windDirection
+      - humidity
+      - fog
+      - cloudiness
+      - lowClouds
+      - mediumClouds
+      - highClouds
+      - dewpointTemperature
+
+  - platform: time_date
+    display_options:
+      - 'time'
+
+
+  - platform: template
+    sensors:
+      chris_travel_time:
+        friendly_name: "Chris' Traffic"
+        value_template: >
+          {{ (as_timestamp(now()) + states.sensor.chris_time_from_work.attributes.duration | int *60) | timestamp_custom("%I:%M %p", true)}}
+        icon_template: mdi:traffic-light
+        entity_id: sensor.time
+
+  - platform: template
+    sensors:
+      heathers_travel_time:
+        friendly_name: "Heather's Traffic"
+        value_template: >
+          {{ (as_timestamp(now()) + states.sensor.heather_s_time_from_work.attributes.duration | int *60) | timestamp_custom("%I:%M %p", true)}}
+        icon_template: mdi:traffic-light
+        entity_id: sensor.time
+
+
+  - platform: darksky
+    api_key: !secret darksky_key
+    forecast:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+    scan_interval: '00:05'
+    monitored_conditions:
+      - summary
+      - icon
+      - temperature
+
+  # Pi CPU temp
+  - platform: command_line
+    name: CPU Temperature
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    # If errors occur, remove degree symbol below
+    unit_of_measurement: "°C"
+    value_template: '{{ value | multiply(0.001) | round(1) }}'
+
+  # DB File Size
+  - platform: filesize
+    scan_interval: 7200 # Don't fill up the database by scanning the database...
+    file_paths:
+      - /home/homeassistant/.homeassistant/home-assistant_v2.db
+
+  # Waze Travel Time
+  - platform: waze_travel_time
+    name: Chris' Time from Work
+    origin: !secret chris_work_origin
+    destination: !secret chris_work_destination
+    region: 'US'
+
+  - platform: waze_travel_time
+    name: Heather's Time from Work
+    origin: !secret heather_work_origin
+    destination: !secret heather_work_destination
+    region: 'US'
+
+  #   # For SSL Cert
+  # - platform: command_line
+  #   name: SSL ETA
+  #   unit_of_measurement: days
+  #   scan_interval: 10800
+  #   command: !secret ssl_command
