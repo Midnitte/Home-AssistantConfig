@@ -1,0 +1,6 @@
+enable_occupancy_simulator:
+  name: Enable Occupancy Simulator
+
+guest_mode:
+  name: Guest Mode
+  icon: mdi:account-plus

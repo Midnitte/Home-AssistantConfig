@@ -3,9 +3,10 @@ sensor.yr_symbol:
 zwave.sigma_designs_uzb_z_wave_usb_adapter:
   is_zwave_plus: true
 sensor.cpu_temperature:
-  unit_of_measurement: °C
   icon: mdi:fan
+  unit_of_measurement: °F
 binary_sensor.front_door_contact:
+  friendly_name: Front Door
   icon: mdi:door-open
 sensor.home_assistant_v2_db:
   icon: mdi:database
@@ -47,3 +48,14 @@ light.corner_light:
   icon: mdi:floor-lamp
 binary_sensor.heather_meta_presence:
   icon: mdi:home-account
+sensor.weatheralerts:
+  icon: mdi:cloud-alert
+sensor.heather_s_time_from_work:
+  friendly_name: Heather's Traffic
+sensor.chris_time_from_work:
+  friendly_name: Chris' Traffic
+person.ginger:
+  entity_picture: '"/local/pictures/profileshotginger.png"'
+input_boolean.enable_occupancy_simulator:
+  friendly_name: Away Mode
+  icon: mid:shield-home

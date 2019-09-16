@@ -12,10 +12,12 @@
   time_zone: America/New_York
   # Customization file
   customize: !include customize.yaml
+  packages: !include_dir_named packages
   # Whitelist files
   whitelist_external_dirs:
     - /home/homeassistant/.homeassistant
     - /home/homeassistant/.homeassistant/tmp/tts
+    - /data/
 
 frontend:
   javascript_version: latest
@@ -23,8 +25,14 @@ frontend:
   extra_html_url:
     - /local/icons.html
 
+# RSS Feeds
+feedreader:
+  urls:
+    - https://status.home-assistant.io/history.rss
+
 
 recorder:
+  db_url: sqlite:///data/home-assistant_v2.db
   exclude:
     entities:
       - sensor.chris_travel_time
@@ -41,6 +49,7 @@ python_script:
 
 updater:
   include_used_components: true
+  reporting: true
 
 # Zones
 zone:
@@ -106,7 +115,7 @@ notify:
     title_param_name: username
     data:
       username: Home Assistant
-    resource: "https://ptb.discordapp.com/api/webhooks/579723491964616752/iO8ggXR1s0x0-YMumt7TzRCLuJkn_L3Pm5hp3c-dEU_QUHhk6EiHHwV53m0QWRHane7I"
+    resource: !secret discord_key
 
 
 # IFTTT Maker
@@ -117,17 +126,20 @@ ifttt:
 weather:
 # Home
   - platform: openweathermap
+    name: Home Weather
     api_key: !secret openweather_key
     latitude: !secret home_latitude
     longitude: !secret home_longitude
 #Chris' Work
   - platform: openweathermap
+    name: Chris' Work
     api_key: !secret openweather_key
     latitude: !secret chris_work_latitude
     longitude: !secret chris_work_longitude
 
 #Heather's Work
   - platform: openweathermap
+    name: Heather's Work
     api_key: !secret openweather_key
     latitude: !secret heather_work_latitude
     longitude: !secret heather_work_longitude
@@ -141,20 +153,19 @@ device_tracker:
     request_rssi: true
     new_device_defaults:
       track_new_devices: true
-  - platform: nmap_tracker
-    hosts: 192.168.40.1/24
-    home_interval: 180
-    interval_seconds: 30
-    exclude:
-      - 192.168.40.19
+  # - platform: nmap_tracker
+  #   hosts: 192.168.40.1/24
+  #   home_interval: 5
+  #   interval_seconds: 30
+  #   exclude:
+  #     - 192.168.40.19
 
-owntracks:
 
-googlehome:
-  devices:
-    - host: 192.168.40.74 #Kitchen
-    - host: 192.168.40.117 #Bedroom?
-    - host: 192.168.40.108 #Living Room?
+# googlehome:
+#   devices:
+#     - host: 192.168.40.74 #Kitchen
+#     - host: 192.168.40.117 #Bedroom?
+#     - host: 192.168.40.108 #Living Room?
 
 google:
   client_id: !secret googleclientidcal
@@ -169,6 +180,7 @@ tts:
   - platform: google_translate
     language: 'en-uk'
 
+input_boolean: !include input_booleans.yaml
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
