@@ -54,6 +54,27 @@
         icon_template: mdi:traffic-light
         entity_id: sensor.time
 
+  - platform: template
+    sensors:
+      is_it_before_noon:
+        friendly_name: "Is it noon yet?"
+        value_template: >
+          {%if as_timestamp(now())| timestamp_custom("%H:%M") < strptime("12:00", "%H%M") %}
+           yes
+          {%- else -%}
+           no
+          {%- endif %}
+        icon_template: mdi:theme-light-dark
+        entity_id: sensor.time
+  - platform: template
+    sensors:
+      chris_phone_battery_level:
+        friendly_name: "Chris' Phone Battery"
+        entity_id: device_tracker.life360_chris
+        unit_of_measurement: '%'
+        value_template: "{{ state_attr('device_tracker.life360_chris', 'battery') }}"
+        icon_template: mdi:battery
+
 
   - platform: darksky
     api_key: !secret darksky_key
@@ -124,3 +145,18 @@
   #   unit_of_measurement: days
   #   scan_interval: 10800
   #   command: !secret ssl_command
+
+  - platform: nintendo_wishlist
+    country: US
+    wishlist:
+      - Spyro
+      - Link's Awakening
+      - Yoshi's Crafted
+      - Super Smash Bros.
+      - Moonlighter
+
+  - platform: rest
+    resource: https://us.api.blizzard.com/data/wow/realm/medivh?namespace=dynamic-us&locale=en_US&access_token=US3z6QZrQjkCdKtb0ywVg8dd9rULqiGi47
+    name: Medivh Status
+    headers:
+      Authorization: !secret wow_server_token

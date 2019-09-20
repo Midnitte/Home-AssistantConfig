@@ -141,16 +141,16 @@
     entity_id: input_boolean.enable_occupancy_simulator
     state: 'off'
   - condition: state
-    entity_id: 'person.heather'
-    state: 'not_home'
+    entity_id: person.heather
+    state: not_home
   action:
   - data_template:
-      message: '<@381239478674522113> should be home around {{ states(''sensor.heathers_travel_time'') }}, about {{
-        states (''sensor.heather_s_time_from_work'') }} minutes. <:white_car:601945741128105991> '
+      message: '<@381239478674522113> should be home around {{ states(''sensor.heathers_travel_time'')
+        }}, about {{ states (''sensor.heather_s_time_from_work'') }} minutes. <:white_car:601945741128105991> '
     service: notify.discord_webhook
 - alias: Heather Work Time
   trigger:
-  - at: '07:00'
+  - at: 07:00
     platform: time
   condition:
   - condition: state
@@ -161,9 +161,12 @@
     state: 'off'
   action:
   - data_template:
-      message: '<@381239478674522113> should get to work around {{ (as_timestamp(now()) + states.sensor.heather_s_time_to_work.attributes.duration | int *60) | timestamp_custom("%I:%M %p", true)}}, about {{
-        states (''sensor.heather_s_time_to_work'') }} minutes. <:white_car:601945741128105991> '
+      message: '<@381239478674522113> should get to work around {{ (as_timestamp(now())
+        + states.sensor.heather_s_time_to_work.attributes.duration | int *60) | timestamp_custom("%I:%M
+        %p", true)}}, about {{ states (''sensor.heather_s_time_to_work'') }} minutes.
+        <:white_car:601945741128105991> '
     service: notify.discord_webhook
+  id: be2345fb66ad4803af7a9cb301d2f741
 - id: '1563723065457'
   alias: AMA Today
   trigger:
@@ -177,8 +180,9 @@
   action:
   - data_template:
       message: 'Looks like there''s a AMA today at {{as_timestamp(states.calendar.iama_schedule.attributes.start_time)
-        | timestamp_custom("%I:%M %p", true)}}. <:reddit:604071838804475936> ```It''s for {{states.calendar.iama_schedule.attributes.message
-        | regex_replace(''\(.+\)'', replace='''', ignorecase=False)}}
+        | timestamp_custom("%I:%M %p", true)}}. <:reddit:604071838804475936> ```It''s
+        for {{states.calendar.iama_schedule.attributes.message | regex_replace(''\(.+\)'',
+        replace='''', ignorecase=False)}}
 
 
         {{states.calendar.iama_schedule.attributes.description}} ```
@@ -191,11 +195,9 @@
   - at: '12:00'
     platform: time
   condition:
-  - condition: template
-    value_template: '{{ (states.sensor.latest_version.state) != (states.sensor.current_version.state)
-      }}'
-  - condition: template
-    value_template: "{{ (states.sensor.latest_version.last_changed) > state_attr('automation.update', 'last_triggered') }}"
+  - condition: state
+    entity_id: binary_sensor.updater
+    state: 'on'
   action:
   - data_template:
       message: Looks like there is an update for <@560986499567452160>. Version {{states.sensor.latest_version.state}}
@@ -210,12 +212,12 @@
   condition: []
   action:
   - data_template:
-      message: "Special weather alert:
+      message: 'Special weather alert:
 
-        ```{{state_attr('sensor.weatheralerts', 'summary')}}```
+        ```{{state_attr(''sensor.weatheralerts'', ''summary'')}}```
 
 
-        {{state_attr('sensor.weatheralerts', 'link')}}"
+        {{state_attr(''sensor.weatheralerts'', ''link'')}}'
     service: notify.discord_webhook
 - id: '1564059714654'
   alias: Camera
@@ -225,24 +227,17 @@
   condition: []
   action:
   - data_template:
-      message: >
-        {% if is_state('group.awesome_people', 'home') %}
-          Someone's home, disabling cameras. <:nocctv:603960321048182811>
-        {% else %}
-          Everyone left, arming cameras. <:cctv:603931638044295211>
-        {% endif %}
+      message: "{% if is_state('group.awesome_people', 'home') %}\n  Someone's home,\
+        \ disabling cameras. <:nocctv:603960321048182811>\n{% else %}\n  Everyone\
+        \ left, arming cameras. <:cctv:603931638044295211>\n{% endif %}\n"
     service: notify.discord_webhook
   - data_template:
-      event: >
-        {% if is_state('group.awesome_people', 'home') %}
-          someones_home
-        {% else %}
-          everyone_left
-        {% endif %}
+      event: "{% if is_state('group.awesome_people', 'home') %}\n  someones_home\n\
+        {% else %}\n  everyone_left\n{% endif %}\n"
     service: ifttt.trigger
 - alias: Weather for Heather Work
   trigger:
-  - at: '07:00'
+  - at: 07:00
     platform: time
   condition:
   - condition: state
@@ -256,12 +251,40 @@
     above: 50
   action:
   - data_template:
-      message: >
-        {% if is_state('sensor.heather_work_rain_precip_0d', 'rain') %}
-          Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d') }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today, with an intensity of {{ states('sensor.heather_work_rain_precip_intensity_0d') }}in. :umbrella:
-        {% elif states('sensor.heather_work_rain_precip_intensity_0d') > 0.2 %}
-          Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d') }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today, with an intensity of {{ states('sensor.heather_work_rain_precip_intensity_0d') }}in. Maybe check if work is closed? :surfer:
-        {% else %}
-          Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d') }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today, with an accumulation of {{ states('sensor.heather_work_rain_precip_accumulation_0d') }}in. :snowman:
-        {% endif %}
+      message: "{% if is_state('sensor.heather_work_rain_precip_0d', 'rain') %}\n\
+        \  Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d')\
+        \ }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today,\
+        \ with an intensity of {{ states('sensor.heather_work_rain_precip_intensity_0d')\
+        \ }}in. :umbrella:\n{% elif states('sensor.heather_work_rain_precip_intensity_0d')\
+        \ > 0.2 %}\n  Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d')\
+        \ }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today,\
+        \ with an intensity of {{ states('sensor.heather_work_rain_precip_intensity_0d')\
+        \ }}in. Maybe check if work is closed? :surfer:\n{% else %}\n  Hey <@381239478674522113>,\
+        \ looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d')\
+        \ }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today,\
+        \ with an accumulation of {{ states('sensor.heather_work_rain_precip_accumulation_0d')\
+        \ }}in. :snowman:\n{% endif %}\n"
+    service: notify.discord_webhook
+  id: 7b798563175e417aab65c056cb4b63b0
+- alias: Guests Here
+  trigger:
+  - entity_id: group.guest_people
+    platform: state
+  condition: []
+  action:
+  - service_template: "{% if is_state('group.guest_people', 'not_home') %}\n  input_boolean.turn_off\n\
+      {% else %}\n  input_boolean.turn_on\n{% endif %}\n"
+    data:
+      entity_id: input_boolean.guest_mode
+  id: 9d01f6d74b424e3a93078b4c9a0dc7fd
+- id: '1568916830543'
+  alias: chris battery
+  trigger:
+  - entity_id: sensor.chris_phone_battery_level
+    platform: numeric_state
+    below: '20'
+  condition: []
+  action:
+  - data_template:
+      message: "<@116694039960485896>'s phone is at {{ states('sensor.chris_phone_battery_level') }}% <:deadbattery:624309813374877698> "
     service: notify.discord_webhook

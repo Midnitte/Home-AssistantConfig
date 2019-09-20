@@ -30,6 +30,7 @@ feedreader:
   urls:
     - https://status.home-assistant.io/history.rss
 
+#circadian_lighting:
 
 recorder:
   db_url: sqlite:///data/home-assistant_v2.db
@@ -180,6 +181,7 @@ tts:
   - platform: google_translate
     language: 'en-uk'
 
+counter: !include counters.yaml
 input_boolean: !include input_booleans.yaml
 group: !include groups.yaml
 automation: !include automations.yaml

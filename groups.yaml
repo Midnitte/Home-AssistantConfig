@@ -5,6 +5,12 @@ awesome_people:
   entities:
    - person.chris
    - person.heather
+guest_people:
+  name: Guests
+  view: false
+  control: hidden
+  entities:
+    - person.ginger
 
 master_bedroom:
   name: Master Bedroom
