@@ -1,188 +1,79 @@
-﻿homeassistant:
-  # Name of the location where Home Assistant is running
-  name: Home
-  # Location required to calculate the time the sun rises and sets
-  latitude: !secret home_latitude
-  longitude: !secret home_longitude
-  # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: 13
-  # metric for Metric, imperial for Imperial
-  unit_system: imperial
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  time_zone: America/New_York
-  # Customization file
-  customize: !include customize.yaml
-  packages: !include_dir_named packages
-  # Whitelist files
-  whitelist_external_dirs:
-    - /home/homeassistant/.homeassistant
-    - /home/homeassistant/.homeassistant/tmp/tts
-    - /data/
-
-frontend:
-  javascript_version: latest
-  themes: !include_dir_merge_named themes
-  extra_html_url:
-    - /local/icons.html
-
-# RSS Feeds
-feedreader:
-  urls:
-    - https://status.home-assistant.io/history.rss
-
-#circadian_lighting:
-
-recorder:
-  db_url: sqlite:///data/home-assistant_v2.db
-  exclude:
-    entities:
-      - sensor.chris_travel_time
 
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
-python_script:
+frontend:
+  themes: !include_dir_merge_named themes
 
-#auth_providers:
- # - type: trusted_networks
-  #  trusted_networks:
-   #   - 192.168.0.0/24
+cloud:
 
-updater:
-  include_used_components: true
-  reporting: true
+homeassistant:
+  country: US
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
 
-# Zones
-zone:
-
-  # This will override the default home zone
+zone: 
   - name: Home
     latitude: !secret home_latitude
     longitude: !secret home_longitude
-    radius: 20
-    icon: mdi:home
+    radius: 200
 
-  - name: Chris' Work
-    latitude: !secret chris_work_latitude
-    longitude: !secret chris_work_longitude
-    radius: 160
-    icon: mdi:microscope
+camera:
+  - platform: ffmpeg
+    input: rtsp://127.0.0.1:8554/front-door-camera
+  
+logger:
+  default: info
+  logs:
+    homeassistant.components.person: debug
 
-  - name: Heather's Work
-    latitude: !secret heather_work_latitude
-    longitude: !secret heather_work_longitude
-    radius: 10
-    icon: mdi:domain
+sensor:
+  platform: weatheralerts
+  state: NJ
+  zone: 27
+  county: 5
 
-# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
-# http:
-#   base_url: example.duckdns.org:8123
+influxdb:
+  database: Homeassistant
+  username: !secret influx_username
+  password: !secret influx_password
+  max_retries: 3
+  default_measurement: state
 
-# Discover some devices automatically
-discovery:
 
-# Pollen
-iqvia:
-  zip_code: !secret zip_code
-  # monitored_conditions:
-  #   - allergy_average_forecasted
-  #   - allergy_index_today
-  #   - allergy_index_tomorrow
-  #   - asthma_average_forecasted
-  #   - asthma_index_today
-  #   - asthma_index_tomorrow
-  #   - disease_average_forecasted
-  #   - disease_index_today
-
-# Telegram Bot for notifications
-telegram_bot:
-  - platform: polling
-    api_key: !secret telegram_api_key
-    allowed_chat_ids:
-      - !secret telegram_group_id
-      - !secret chris_telegram_id
-
-# Discord Bot
+binary_sensor:
+  - platform: ping
+    host: 192.168.100.1
+    name: router
+  - platform: ping
+    host: www.google.com
+    name: google
 
 notify:
   - platform: discord
-    name: discord
-    token: !secret discord_token
-
-  - platform: rest
-    name: discord_webhook
-    method: POST
-    message_param_name: content
-    title_param_name: username
-    data:
-      username: Home Assistant
-    resource: !secret discord_key
-
-
-# IFTTT Maker
-ifttt:
-  key: !secret ifttt_key
-
-# Weather Data
-weather:
-# Home
-  - platform: openweathermap
-    name: Home Weather
-    api_key: !secret openweather_key
-    latitude: !secret home_latitude
-    longitude: !secret home_longitude
-#Chris' Work
-  - platform: openweathermap
-    name: Chris' Work
-    api_key: !secret openweather_key
-    latitude: !secret chris_work_latitude
-    longitude: !secret chris_work_longitude
-
-#Heather's Work
-  - platform: openweathermap
-    name: Heather's Work
-    api_key: !secret openweather_key
-    latitude: !secret heather_work_latitude
-    longitude: !secret heather_work_longitude
-
-
-# Trackers
-device_tracker:
-  - platform: bluetooth_tracker
-    consider_home: 00:20:00
-    interval_seconds: 20
-    request_rssi: true
-    new_device_defaults:
-      track_new_devices: true
-  # - platform: nmap_tracker
-  #   hosts: 192.168.40.1/24
-  #   home_interval: 5
-  #   interval_seconds: 30
-  #   exclude:
-  #     - 192.168.40.19
-
-
-# googlehome:
-#   devices:
-#     - host: 192.168.40.74 #Kitchen
-#     - host: 192.168.40.117 #Bedroom?
-#     - host: 192.168.40.108 #Living Room?
-
-google:
-  client_id: !secret googleclientidcal
-  client_secret: !secret googlesecretcal
-
-# Sensors
-sensor: !include sensor.yaml
-binary_sensor: !include binary_sensor.yaml
-
+    name: weatherbot
+    token: !secret weather_token
+  - platform: discord
+    name: homebot
+    token: !secret home_token
 # Text to speech
 tts:
   - platform: google_translate
-    language: 'en-uk'
+  
+light:
+  - platform: group
+    name: Living Room Lights
+    entities:
+      - light.fireplace_lamp
+      - light.living_room_window
+  - platform: group
+    name: Bedroom
+    entities:
+      - light.bedroom_corner_light
+      - light.chris_nightstand
+      - light.heather_nightstand
 
-counter: !include counters.yaml
-input_boolean: !include input_booleans.yaml
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
+scene: !include scenes.yaml

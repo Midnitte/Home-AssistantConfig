@@ -1,290 +1,293 @@
-- id: '1554596874312'
-  alias: Reminder for Temp
+- id: '1631640672138'
+  alias: Discord Morning Weather
+  description: Notify discord about the current weather in the morning.
   trigger:
-  - at: '20:00'
-    platform: time
-  condition:
-    condition: or
-    conditions:
-    - above: '72'
-      condition: numeric_state
-      entity_id: sensor.bedroom_button_temperature_measurement
-    - below: '65'
-      condition: numeric_state
-      entity_id: sensor.bedroom_button_temperature_measurement
-  action:
-  - data_template:
-      message: Did someone remember to adjust the temperature? Its currently {{ states
-        ('sensor.bedroom_button_temperature_measurement') }}°F
-    service: notify.discord_webhook
-- id: '1554597530878'
-  alias: Chris Home Time
-  trigger:
-    platform: zone
-    entity_id: person.chris
-    zone: zone.chris_work
-    event: leave
-  condition:
-  - after: '14:00'
-    before: '20:00'
-    condition: time
-  action:
-  - data_template:
-      message: 'Chris will be home at about {{ states(''sensor.chris_travel_time'')
-        }}. About {{ states(''sensor.chris_time_from_work'') }} minutes. :red_car:'
-    service: notify.discord_webhook
-- id: '1554641088415'
-  alias: Starting to Rain
-  trigger:
-  - entity_id: sensor.dark_sky_icon
-    platform: state
-    to: rain
-  condition:
-    condition: and
-    conditions:
-    - condition: time
-      after: 08:00
-      before: '22:00'
-    - condition: template
-      value_template: '{% set last_run = as_timestamp(state_attr(''automation.starting_to_rain'',
-        ''last_triggered'')) %} {{ (last_run == none or (as_timestamp(now()) - last_run)
-        > 60*60) }}'
-  action:
-  - data:
-      message: 'It looks like it''s starting to rain. :cloud_rain:'
-    service: notify.discord_webhook
-- id: '1555204301721'
-  alias: Might Rain
-  trigger:
-  - at: '7:00'
-    platform: time
-  condition:
-  - condition: state
-    entity_id: sensor.dark_sky_icon_0
-    state: rain
-  action:
-  - data:
-      message: 'Looks like it might rain today :umbrella:'
-    service: notify.discord_webhook
-- alias: Pollen
-  trigger:
-  - at: '7:00'
-    platform: time
-  condition:
-  - condition: numeric_state
-    entity_id: sensor.allergy_index_today
-    above: 5.9
-  action:
-  - data_template:
-      message: 'The pollen count is {{ states(''sensor.allergy_index_today'')}} out
-        of 12 today. :sneezing_face:'
-    service: notify.discord_webhook
-  id: 96ae3de2cf8e4ca4bac7114a7ea3e368
-- id: '1556157989107'
-  alias: Test Discord
-  trigger:
-  - above: '78'
-    entity_id: sensor.bedroom_button_temperature_measurement
-    platform: numeric_state
+  - platform: time
+    at: 06:00:00
   condition: []
   action:
-  - data:
-      message: Testing. . .
-    service: notify.discord_webhook
-- id: '1556233096462'
-  alias: No Ones Home
-  trigger:
-  - entity_id: group.awesome_people
-    platform: state
-    to: not_home
-  condition: []
-  action:
-  - data:
-      message: 'No ones at home, turning off lights. :house_abandoned: '
-    service: notify.discord_webhook
-  - data:
-      entity_id: group.all_lights
-    service: light.turn_off
-- id: '1558277408793'
-  alias: Chris Is Home
-  trigger:
-  - entity_id: person.chris
-    platform: state
-    to: home
-  condition: []
-  action:
-  - data:
-      message: Chris is home <:chrisjuice:604005113052528640>
-    service: notify.discord_webhook
-- id: '1558280857191'
-  alias: Gingers Here
-  trigger:
-  - entity_id: device_tracker.galaxy_s9_lan
-    platform: state
-    to: home
-  condition: []
-  action:
-  - alias: ''
-    data:
-      message: It looks like Ginger is here.
-    service: notify.discord_webhook
-- id: '1563585162092'
-  alias: Heather Home Time
-  trigger:
-  - at: '16:30'
-    platform: time
-  condition:
-  - condition: state
-    entity_id: binary_sensor.workday_sensor
-    state: 'on'
-  - condition: state
-    entity_id: input_boolean.enable_occupancy_simulator
-    state: 'off'
-  - condition: state
-    entity_id: person.heather
-    state: not_home
-  action:
-  - data_template:
-      message: '<@381239478674522113> should be home around {{ states(''sensor.heathers_travel_time'')
-        }}, about {{ states (''sensor.heather_s_time_from_work'') }} minutes. <:white_car:601945741128105991> '
-    service: notify.discord_webhook
-- alias: Heather Work Time
-  trigger:
-  - at: 07:00
-    platform: time
-  condition:
-  - condition: state
-    entity_id: binary_sensor.workday_sensor
-    state: 'on'
-  - condition: state
-    entity_id: input_boolean.enable_occupancy_simulator
-    state: 'off'
-  action:
-  - data_template:
-      message: '<@381239478674522113> should get to work around {{ (as_timestamp(now())
-        + states.sensor.heather_s_time_to_work.attributes.duration | int *60) | timestamp_custom("%I:%M
-        %p", true)}}, about {{ states (''sensor.heather_s_time_to_work'') }} minutes.
-        <:white_car:601945741128105991> '
-    service: notify.discord_webhook
-  id: be2345fb66ad4803af7a9cb301d2f741
-- id: '1563723065457'
-  alias: AMA Today
-  trigger:
-  - at: 08:00
-    platform: time
-  condition:
-  - condition: template
-    value_template: '{{as_timestamp(states.calendar.iama_schedule.attributes.start_time)
-      | timestamp_custom("%m-%d-%y", true) == as_timestamp(now()) | timestamp_custom("%m-%d-%y",
-      true) }}'
-  action:
-  - data_template:
-      message: 'Looks like there''s a AMA today at {{as_timestamp(states.calendar.iama_schedule.attributes.start_time)
-        | timestamp_custom("%I:%M %p", true)}}. <:reddit:604071838804475936> ```It''s
-        for {{states.calendar.iama_schedule.attributes.message | regex_replace(''\(.+\)'',
-        replace='''', ignorecase=False)}}
-
-
-        {{states.calendar.iama_schedule.attributes.description}} ```
+  - service: notify.weatherbot
+    data_template:
+      target: !secret discord_target
+      message: 'Its currently **{{ states(''weather.condo'') }}** and **{{ state_attr(''weather.condo'',''temperature'')
+        }}°F**.{{"\n"}} The pollen count for today is **{{ states(''sensor.allergy_index_today'')
+        }}**.{{"\n"}} Top allergens today:{{"\n"}} ``` {{ state_attr(''sensor.allergy_index_today'',''allergen_name_1'')
+        }}{{"\n"}} {{ state_attr(''sensor.allergy_index_today'',''allergen_name_2'')
+        }}{{"\n"}} {{ state_attr(''sensor.allergy_index_today'',''allergen_name_3'')
+        }} ```
 
         '
-    service: notify.discord_webhook
-- id: '1563907182430'
-  alias: Update
+  mode: single
+- id: '1631666335642'
+  alias: Sleepy Time
+  description: Turn the lights off slowly over an hour.
   trigger:
-  - at: '12:00'
-    platform: time
-  condition:
-  - condition: state
-    entity_id: binary_sensor.updater
-    state: 'on'
-  action:
-  - data_template:
-      message: Looks like there is an update for <@560986499567452160>. Version {{states.sensor.latest_version.state}}
-        is released.
-    service: notify.discord_webhook
-- id: '1563987257474'
-  alias: NWS Alert
-  trigger:
-  - entity_id: sensor.weatheralerts
-    platform: state
-    to: Special Weather Statement
+  - platform: time
+    at: '20:30:00'
   condition: []
   action:
-  - data_template:
-      message: 'Special weather alert:
-
-        ```{{state_attr(''sensor.weatheralerts'', ''summary'')}}```
-
-
-        {{state_attr(''sensor.weatheralerts'', ''link'')}}'
-    service: notify.discord_webhook
-- id: '1564059714654'
-  alias: Camera
-  trigger:
-  - entity_id: group.awesome_people
-    platform: state
-  condition: []
-  action:
-  - data_template:
-      message: "{% if is_state('group.awesome_people', 'home') %}\n  Someone's home,\
-        \ disabling cameras. <:nocctv:603960321048182811>\n{% else %}\n  Everyone\
-        \ left, arming cameras. <:cctv:603931638044295211>\n{% endif %}\n"
-    service: notify.discord_webhook
-  - data_template:
-      event: "{% if is_state('group.awesome_people', 'home') %}\n  someones_home\n\
-        {% else %}\n  everyone_left\n{% endif %}\n"
-    service: ifttt.trigger
-- alias: Weather for Heather Work
-  trigger:
-  - at: 07:00
-    platform: time
-  condition:
-  - condition: state
-    entity_id: binary_sensor.workday_sensor
-    state: 'on'
-  - condition: state
-    entity_id: input_boolean.enable_occupancy_simulator
-    state: 'off'
-  - condition: numeric_state
-    entity_id: sensor.heather_work_rain_precip_probability_0d
-    above: 50
-  action:
-  - data_template:
-      message: "{% if is_state('sensor.heather_work_rain_precip_0d', 'rain') %}\n\
-        \  Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d')\
-        \ }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today,\
-        \ with an intensity of {{ states('sensor.heather_work_rain_precip_intensity_0d')\
-        \ }}in. :umbrella:\n{% elif states('sensor.heather_work_rain_precip_intensity_0d')\
-        \ > 0.2 %}\n  Hey <@381239478674522113>, looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d')\
-        \ }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today,\
-        \ with an intensity of {{ states('sensor.heather_work_rain_precip_intensity_0d')\
-        \ }}in. Maybe check if work is closed? :surfer:\n{% else %}\n  Hey <@381239478674522113>,\
-        \ looks like theres a {{ states('sensor.heather_work_rain_precip_probability_0d')\
-        \ }}% chance of {{states('sensor.heather_work_rain_precip_0d')}} at work today,\
-        \ with an accumulation of {{ states('sensor.heather_work_rain_precip_accumulation_0d')\
-        \ }}in. :snowman:\n{% endif %}\n"
-    service: notify.discord_webhook
-  id: 7b798563175e417aab65c056cb4b63b0
-- alias: Guests Here
-  trigger:
-  - entity_id: group.guest_people
-    platform: state
-  condition: []
-  action:
-  - service_template: "{% if is_state('group.guest_people', 'not_home') %}\n  input_boolean.turn_off\n\
-      {% else %}\n  input_boolean.turn_on\n{% endif %}\n"
+  - service: light.turn_off
+    target:
+      area_id: bedroom
     data:
-      entity_id: input_boolean.guest_mode
-  id: 9d01f6d74b424e3a93078b4c9a0dc7fd
-- id: '1568916830543'
-  alias: chris battery
+      transition: 3600
+  mode: single
+- id: '1631716153870'
+  alias: Chris Drive Time
+  description: Time it takes Chris to get home
   trigger:
-  - entity_id: sensor.chris_phone_battery_level
-    platform: numeric_state
-    below: '20'
+  - platform: zone
+    entity_id: device_tracker.chris_note22
+    zone: zone.chris_s_work
+    event: leave
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    after: '14:00:00'
+    before: 00:00:00
+  - condition: state
+    entity_id: timer.chris_car_timer
+    state: idle
+  action:
+  - service: notify.homebot
+    data_template:
+      target: !secret discord_target
+      message: Chris will be home in about {{ states('sensor.chris_travel_time') }}
+        minutes (via {{ state_attr('sensor.chris_travel_time', 'route') }})
+  - service: timer.start
+    data:
+      duration: '0'
+    target:
+      entity_id: timer.chris_car_timer
+  mode: single
+- id: '1631716820241'
+  alias: Heather Travel Time
+  description: Time for Heather to get home
+  trigger:
+  - platform: time
+    at: '16:20:00'
+  condition:
+  - condition: not
+    conditions:
+    - condition: zone
+      entity_id: person.heather
+      zone: zone.home
+  - condition: time
+    after: '16:00:00'
+    before: '17:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+  action:
+  - service: notify.homebot
+    data_template:
+      target: !secret discord_target
+      message: Heather's drive will be about {{ states('sensor.heather_travel_time')
+        }} minutes (via {{ state_attr('sensor.heather_travel_time', 'route') }})
+  mode: single
+- id: '1631838569878'
+  alias: Bedroom Button
+  description: Control what button does.
+  trigger:
+  - device_id: 80084b2bd66eeb0a43c1ad7786a4db4c
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: remote_button_short_press
+  condition:
+  - condition: state
+    entity_id: timer.bedroomlighttimer
+    state: idle
+  action:
+  - service: timer.start
+    data:
+      duration: '10'
+    target:
+      entity_id: timer.bedroomlighttimer
+  - service: light.toggle
+    data: {}
+    target:
+      area_id: bedroom
+  mode: single
+- id: '1632081644275'
+  alias: Living Room Button
+  description: Control what button does.
+  trigger:
+  - device_id: 39db91851bc1dfa679ba57165f914767
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: remote_button_short_press
+  - device_id: 39db91851bc1dfa679ba57165f914767
+    domain: zha
+    platform: device
+    type: remote_button_double_press
+    subtype: remote_button_double_press
+  - device_id: 39db91851bc1dfa679ba57165f914767
+    domain: zha
+    platform: device
+    type: remote_button_long_press
+    subtype: remote_button_long_press
   condition: []
   action:
-  - data_template:
-      message: "<@116694039960485896>'s phone is at {{ states('sensor.chris_phone_battery_level') }}% <:deadbattery:624309813374877698> "
-    service: notify.discord_webhook
+  - service: light.toggle
+    data: {}
+    target:
+      area_id: living_room
+  mode: single
+- id: '1632094679575'
+  alias: Autofan
+  description: turn on the fan if the temperature difference is greater than 1deg
+  trigger:
+  - platform: template
+    value_template: '{{ (states(''sensor.loft_sensor_temperature'')|float - states(''sensor.living_room_button_temperature'')|float)
+      >= 1.0 }}'
+  condition:
+  - condition: time
+    after: 08:00:00
+    before: '20:00:00'
+  - condition: state
+    entity_id: timer.fan_timer
+    state: idle
+  - condition: state
+    entity_id: fan.living_room_fan
+    state: 'off'
+  action:
+  - service: notify.homebot
+    data:
+      message: Temperature different greater than 1.0, turning on fan!
+      target: !secret discord_target
+  - service: timer.start
+    data:
+      duration: '0'
+    target:
+      entity_id: timer.fan_timer
+  - service: fan.set_speed
+    target:
+      device_id: 4ba0936fe51d4e347ae0c77865591111
+    data:
+      speed: '10'
+  mode: single
+- id: '1632271081249'
+  alias: Autofan off
+  description: turn off the fan if the temperature difference is less than 0.5deg
+  trigger:
+  - platform: template
+    value_template: '{{ (states(''sensor.loft_sensor_temperature'')|float - states(''sensor.living_room_button_temperature'')|float)
+      <= 0.5 }}'
+  condition:
+  - condition: time
+    after: 08:00:00
+    before: '20:00:00'
+  - condition: state
+    entity_id: timer.fan_timer
+    state: idle
+  - condition: state
+    entity_id: fan.living_room_fan
+    state: 'on'
+  action:
+  - service: notify.homebot
+    data:
+      message: Temperature difference less than 0.5, turning off fan!
+      target: !secret discord_target
+  - service: fan.set_speed
+    target:
+      device_id: 4ba0936fe51d4e347ae0c77865591111
+    data:
+      speed: '0'
+  mode: single
+- id: '1632820595137'
+  alias: Alarm Light
+  description: Turn on the lights after alarm is dismissed.
+  trigger:
+  - platform: mqtt
+    topic: SleepAsAndroid
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    after: 04:00:00
+    before: 07:00:00
+  action:
+  - service: light.turn_on
+    data:
+      brightness_pct: 25
+    target:
+      area_id: living_room
+  mode: single
+- id: '1644704972132'
+  alias: Loft Light
+  description: switch loft light based on sensor
+  trigger:
+  - type: opened
+    platform: device
+    device_id: e575b162106d7bb3ff7d5c79329f138a
+    entity_id: binary_sensor.loft_sensor_ias_zone
+    domain: binary_sensor
+  condition: []
+  action:
+  - type: toggle
+    device_id: d7b52f539195a06eb010709cfc425cce
+    entity_id: light.loft_light
+    domain: light
+  mode: single
+- id: '1646592331304'
+  alias: Discord Watch Charge
+  description: Notify discord about charging watch.
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.sm_r890_battery_level
+    below: '40'
+  condition: []
+  action:
+  - wait_template: '{{ is_state(''person.chris'', ''home'') }}'
+  - service: notify.homebot
+    data_template:
+      target: !secret discord_target
+      message: <@116694039960485896> watch is currently at {{states('sensor.sm_r890_battery_level')}}%
+        and needs to recharge.
+  mode: single
+- id: '1647121107362'
+  alias: Cast to Google Hub
+  description: ''
+  use_blueprint:
+    path: kind3r/cast-and-re-cast-a-lovelace-view-to-a-google-hub.yaml
+    input:
+      player: media_player.kitchen_display
+      view: home
+- id: '1647122312312'
+  alias: Set theme at startup
+  description: Set the theme at start up.
+  trigger:
+  - platform: homeassistant
+    event: start
+  action:
+  - service: frontend.set_theme
+    data:
+      mode: dark
+      name: noctis-solarized
+  mode: single
+- id: '1680353539854'
+  alias: Low Battery
+  description: Alert for low battery
+  use_blueprint:
+    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
+    input:
+      actions:
+      - service: notify.homebot
+        data_template:
+          target: !secret discord_target
+          message: 'Low Battery: {{sensors}}'
+      threshold: 20

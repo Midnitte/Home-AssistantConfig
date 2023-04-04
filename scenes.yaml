@@ -1,0 +1,30 @@
+- id: '1631838279805'
+  name: Bedroom
+  entities:
+    light.corner_bedroom_light:
+      min_mireds: 153
+      max_mireds: 370
+      supported_color_modes:
+      - color_temp
+      off_brightness:
+      friendly_name: Corner Bedroom Light
+      supported_features: 43
+      state: 'off'
+    light.osram_lightify_a19_tunable_white_16af0400_level_light_color_on_off:
+      min_mireds: 153
+      max_mireds: 370
+      supported_color_modes:
+      - color_temp
+      off_brightness:
+      friendly_name: Heathers Nightstand
+      supported_features: 43
+      state: 'off'
+    light.osram_lightify_a19_tunable_white_7f3c0200_level_light_color_on_off:
+      min_mireds: 153
+      max_mireds: 370
+      supported_color_modes:
+      - color_temp
+      off_brightness:
+      friendly_name: Chris's Nightstand
+      supported_features: 43
+      state: 'off'
